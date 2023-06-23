@@ -581,6 +581,10 @@ public class GameLogic : MonoBehaviour
         gameBoard.GetComponent<GameBoard>().UpdatePices();
         EndPlayerTurn(currentPlayer);
         gameHistory.Add(FENfromBoardState());
+        if (halfMoves > 50) 
+        {
+            Debug.Log("Remis!");
+        }
         Debug.Log("Turn" + turn.ToString());
         Debug.Log("HalfMoves" + halfMoves.ToString());
     }
