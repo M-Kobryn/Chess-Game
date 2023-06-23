@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: dd3134944088386409ca682ac16b94ca
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - BlankSquare: {fileID: 21300000, guid: 9755a33c7f4d6a24eadfee49cda81130, type: 3}
+  - PicesSpriteArray: {fileID: 4343727234628468602, guid: db5976480b72b7547a85f13602e988fe, type: 2}
+  - SquareTemplate: {fileID: 41667624083781587, guid: f50a661bd3a8354418f5c2c184eb77a6, type: 3}
+  - PiceTemplate: {fileID: 1115908305224110493, guid: 1c4448c455bd5384ba8520c47263e23b, type: 3}
+  executionOrder: 200
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
