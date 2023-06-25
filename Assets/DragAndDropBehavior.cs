@@ -39,7 +39,6 @@ public class DragAndDropBehavior : MonoBehaviour
         RaycastHit ray;
         if (Physics.Raycast(tmp, Vector3.forward, out ray, Mathf.Infinity))
         {
-            Debug.Log("Hit");
             tmp = ray.transform.position;
             transform.position = new Vector3(tmp.x, tmp.y, transform.position.z);
         }

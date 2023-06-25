@@ -26,5 +26,34 @@ namespace Assets
             }
             return new Vector2Int(-1, -1);
         }
+        public static T[,] FlipHorizontaly2DArray<T>(this T[,] array) 
+        {
+            T[,] outputArray = new T[array.GetLength(0) , array.GetLength(0)];
+            int rows = array.GetLength(0);
+            int cols = array.GetLength(1);
+            for (int x = 0; x < rows; x++) 
+            {
+                for (int y = 0; y < cols; y++) 
+                {
+                    outputArray[x,y] = array[rows -1 - x , y];
+                }
+            }
+            return outputArray;
+        }
+
+        public static T[,] FlipVerticaly2DArray<T>(this T[,] array)
+        {
+            T[,] outputArray = new T[array.GetLength(0), array.GetLength(0)];
+            int rows = array.GetLength(0);
+            int cols = array.GetLength(1);
+            for (int x = 0; x < rows; x++)
+            {
+                for (int y = 0; y < cols; y++)
+                {
+                    outputArray[x, y] = array[x , cols - 1 - y];
+                }
+            }
+            return outputArray;
+        }
     }
 }

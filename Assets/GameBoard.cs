@@ -18,15 +18,34 @@ public class GameBoard : MonoBehaviour
     public GameObject pices;
     public GameObject gameLogic;
 
+    private float offset;
+
     [HideInInspector]
     public GameObject[,] squareGameObjectArray;
     private List<GameObject> piceList = new List<GameObject>();
 
-    public Vector2 cellSize;
+    private float boardLenght;
+    private Vector2 startPos;
+    private float cellSize;
+    private int player = 0;
+
+
+
     // Start is called before the first frame update
     void Start()
     {
-        board  = gameLogic.GetComponent<GameLogic>().board;
+        float height = Camera.main.orthographicSize * 2;
+        offset = height / 100;
+        boardLenght = (height - 2*offset) / 8;
+        startPos = Camera.main.ViewportToWorldPoint(new Vector3(0, 0, 0)) + new Vector3(boardLenght / 2, boardLenght / 2, 0) + new Vector3(offset,offset,0);
+        cellSize = boardLenght / 2;
+
+
+        board  = Utility.FlipHorizontaly2DArray( gameLogic.GetComponent<GameLogic>().board);
+        if (player == 1)
+        {
+            board = Utility.FlipHorizontaly2DArray(Utility.FlipVerticaly2DArray(board));
+        }
         BoardObject.transform.parent = gameObject.transform;
         squareGameObjectArray = new GameObject[8, 8];
         CreateBoard();
@@ -40,14 +59,16 @@ public class GameBoard : MonoBehaviour
 
     void DrawSquare(Vector3 position, Sprite sprite, Color color, Vector2Int xy)  
     {
-
+        Vector2 coff = new Vector2( boardLenght *100 / sprite.textureRect.width, boardLenght *100 / sprite.textureRect.height);
         GameObject child = new GameObject();
+        child.transform.localScale = new Vector3(child.transform.localScale.x *coff.x, child.transform.localScale.y * coff.y, 1);
         child.transform.parent = BoardObject.transform;
         child.layer = LayerMask.NameToLayer("Board");
         child.name = sprite.name +  xy.x.ToString() + xy.y.ToString();
         squareGameObjectArray[xy.x, xy.y] = child;
         child.AddComponent<SpriteRenderer>();
         child.GetComponent<SpriteRenderer>().sprite = sprite;
+        child.GetComponent<SpriteRenderer>().sortingLayerID = SortingLayer.NameToID("Board");
         child.GetComponent<SpriteRenderer>().color = color;
         child.AddComponent<BoxCollider>();
         child.transform.position = position;
@@ -55,8 +76,11 @@ public class GameBoard : MonoBehaviour
     void DrawPice (Vector3 position, Sprite sprite, Color color, Vector2 xy)
     {
         GameObject child = Instantiate(PiceTemplate,position, Quaternion.identity, pices.transform);
+        Vector2 coff = new Vector2(boardLenght * 100 / sprite.textureRect.width, boardLenght * 100 / sprite.textureRect.height)* 0.8f;
+        child.transform.localScale = new Vector3(child.transform.localScale.x * coff.x, child.transform.localScale.y * coff.y, 1);
         child.GetComponent<SpriteRenderer>().sprite = sprite;
         child.GetComponent<SpriteRenderer>().color = color;
+        child.GetComponent<SpriteRenderer>().sortingLayerID = SortingLayer.NameToID("Pieces");
         if (color == Color.white) child.tag = "White";
         else 
         {
@@ -75,16 +99,21 @@ public class GameBoard : MonoBehaviour
         {
             for (int y = 0; y < board.GetLength(1); y++) 
             {
-                DrawSquare(new Vector3(squareSize.x * x, squareSize.y * y, 0), BlankSquare, ( (x+y) % 2) == 0 ? blackSquareColor : whiteSquareColor , new Vector2Int( x,y ) );
+                DrawSquare(new Vector3(boardLenght * x + startPos.x, boardLenght * y + startPos.y, 0), BlankSquare, ( (x+y) % 2) == 0 ? whiteSquareColor : blackSquareColor, new Vector2Int( x,y ) );
 
                 if (board[x, y] != 0) 
                 {
                     int spriteIndex = board[x,y] &  Pices.piceMask;
                     Color color = (board[x, y] & Pices.colorMask) == Pices.white ? Color.white: Color.black;
                     Sprite[] sprites = new Sprite[6];
-                    DrawPice(new Vector3(squareSize.x * x, squareSize.y * y, -1), PicesSpriteArray.GetSprite("ChessPices_" + spriteIndex.ToString()), color, new Vector2(x, y));
+                    DrawPice(new Vector3(boardLenght * x + startPos.x, boardLenght * y + startPos.y, -1), PicesSpriteArray.GetSprite("ChessPices_" + spriteIndex.ToString()), color, new Vector2(x, y));
                 }
             }
+        }
+        squareGameObjectArray = Utility.FlipHorizontaly2DArray(squareGameObjectArray);
+        if (player == 1)
+        {
+            squareGameObjectArray = Utility.FlipHorizontaly2DArray(Utility.FlipVerticaly2DArray(squareGameObjectArray));
         }
     }
 
@@ -94,7 +123,11 @@ public class GameBoard : MonoBehaviour
         {
             Destroy(obj);
         }
-        board = gameLogic.GetComponent<GameLogic>().board;
+        board = Utility.FlipHorizontaly2DArray(gameLogic.GetComponent<GameLogic>().board);
+        if (player == 1)
+        {
+            board = Utility.FlipHorizontaly2DArray(Utility.FlipVerticaly2DArray(board));
+        }
         piceList = new List<GameObject>();
         for (int x = 0; x < board.GetLength(0); x++)
         {
@@ -105,7 +138,7 @@ public class GameBoard : MonoBehaviour
                     int spriteIndex = board[x, y] & Pices.piceMask;
                     Color color = (board[x, y] & Pices.colorMask) == Pices.white ? Color.white : Color.black;
                     Sprite[] sprites = new Sprite[6];
-                    DrawPice(new Vector3(squareSize.x * x, squareSize.y * y, -1), PicesSpriteArray.GetSprite("ChessPices_" + spriteIndex.ToString()), color, new Vector2(x, y));
+                    DrawPice(new Vector3(boardLenght * x + startPos.x, boardLenght * y + startPos.y, -1), PicesSpriteArray.GetSprite("ChessPices_" + spriteIndex.ToString()), color, new Vector2(x, y));
                 }
             }
         }

@@ -3,20 +3,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Transactions;
 using System.Xml.Schema;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
+using System.Threading;
+using TMPro;
 
 public class GameLogic : MonoBehaviour
 {
     public int[,] board = new int[8, 8];
-    private Vector2 chosenPice;
-    private int promotionFigure;
     public GameObject gameBoard;
-
     private List<string> gameHistory = new List<string>();
 
     private int currentPlayer;
@@ -24,6 +25,13 @@ public class GameLogic : MonoBehaviour
     string enpasanePassedSuare;
     private int halfMoves;
     private int turn;
+
+    public GameObject text;
+    public bool autoPlay;
+
+    public GameObject controller;
+
+    private bool gameEnded = false;
 
     private static Dictionary<int, char> boardToFen = new Dictionary<int, char> 
     { 
@@ -45,32 +53,46 @@ public class GameLogic : MonoBehaviour
 
     private static Dictionary<int, string> columnToLetter = new Dictionary<int, string>
     {
-        { 0 , "h"  },
-        { 1 , "g"  },
-        { 2 , "f"  },
-        { 3 , "e"  },
-        { 4 , "d"  },
-        { 5 , "c"  },
-        { 6 , "b"  },
-        { 7 , "a"  }
+        { 0 , "a"  },
+        { 1 , "b"  },
+        { 2 , "c"  },
+        { 3 , "d"  },
+        { 4 , "e"  },
+        { 5 , "f"  },
+        { 6 , "g"  },
+        { 7 , "h"  }
     };
 
 
 
-
-    // Start is called before the first frame update
-    void Start()
+    private void Update()
     {
-        gameHistory.Append("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-        boardStateFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-        Debug.Log("");
 
     }
 
-    // Update is called once per frame
-    void Update()
+    void Start()
     {
-       
+        gameHistory.Add("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        boardStateFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+        //Matrix4x4 mat = Camera.main.projectionMatrix;
+        //mat *= Matrix4x4.Scale(new Vector3(-1, 1, 1));
+        //Camera.main.projectionMatrix = mat;
+        controller.GetComponent<ChessEngineController>().OnNewBestMove += DoMove;
+
+
+
+    }
+    private async void DoMove(object sender, EventArgs e)
+    {
+        if (!gameEnded && autoPlay) 
+        {
+            string move = controller.GetComponent<ChessEngineController>().bestMove.Last();
+            Vector2Int from = stringPositionToBoard(move.Substring(0, 2));
+            Vector2Int to = stringPositionToBoard(move.Substring(2, 2));
+            MovePice(from, to);
+            await controller.GetComponent<ChessEngineController>().NewMove(gameHistory.Last());
+        }
     }
 
     private void EndPlayerTurn( int player ) 
@@ -121,13 +143,22 @@ public class GameLogic : MonoBehaviour
             }
             output.Append('/');
         }
+        output.Length--;
         output.Append(' ');
 
         output.Append(currentPlayer == 0 ? "w" : "b" );
 
         output.Append(' ');
 
-        output.Append(castleAbility);
+        if (castleAbility == "")
+        {
+            output.Append("-");
+        }
+        else 
+        {
+            output.Append(castleAbility);
+        }
+        output.Append(' ');
 
         output.Append(enpasanePassedSuare);
         output.Append(' ');
@@ -189,7 +220,6 @@ public class GameLogic : MonoBehaviour
     }
     public List<Vector3Int> PossibleMoves(Vector2Int position) 
     {
-
         List<Vector3Int> possibleMoves = UnrestricedPossibleMoves(position);
         if ((board[position.x, position.y] & Pices.piceMask) == Pices.king)
         {
@@ -208,6 +238,7 @@ public class GameLogic : MonoBehaviour
         int x = position.x;
         int y = position.y;
 
+        //
         List<Vector3Int> movesToRemove = new List<Vector3Int>();
         if (piceType == Pices.king) 
         {
@@ -283,7 +314,7 @@ public class GameLogic : MonoBehaviour
     {
         List < Vector3Int > possibleMoves = new List<Vector3Int>();
         int d = 0;
-        if (y == board.GetLength(0) || y == board.GetLength(1)) 
+        if (y == 0 || y == board.GetLength(1) -1) 
         {
             return possibleMoves;
         }
@@ -312,7 +343,7 @@ public class GameLogic : MonoBehaviour
         {
             possibleMoves.Add(new Vector3Int(x + 1, y + d, 1));
         }
-        if (x - 1 > 0 && board[x - 1, y + d] != Pices.blank && Pices.IsOppositeColor(board[x - 1 , y + d],color))
+        if (x - 1 >= 0 && board[x - 1, y + d] != Pices.blank && Pices.IsOppositeColor(board[x - 1 , y + d],color))
         {
             possibleMoves.Add(new Vector3Int(x - 1, y + d, 1));
         }
@@ -499,14 +530,12 @@ public class GameLogic : MonoBehaviour
 
     private string boardPositionToString(Vector2Int position) 
     {
-        return columnToLetter[position.x] + (7 - position.y +1).ToString();
+        return columnToLetter[position.x] + (8 - position.y).ToString();
     }
 
     private Vector2Int stringPositionToBoard(string position)
     {
-        if (enpasanePassedSuare == "-")
-            return new Vector2Int(-1, -1);
-        return new Vector2Int(columnToLetter.FirstOrDefault(z => z.Value == position[0].ToString()).Key , 7 - Int32.Parse( position[1].ToString()) + 1);
+        return new Vector2Int(columnToLetter.FirstOrDefault(z => z.Value == position[0].ToString()).Key , 8 - Int32.Parse( position[1].ToString()));
     }
 
     public bool MovePice(Vector2Int from, Vector2Int destination) 
@@ -567,12 +596,18 @@ public class GameLogic : MonoBehaviour
         }
         return false;
     }
-
-    public void AfterMove(int colorThatMoved) 
+    public async void AfterMove(int colorThatMoved) 
     {
-        if (!IsCheckmate(Pices.ShiftColor(colorThatMoved))) 
+        if (!IsCheckmate(Pices.ShiftColor(colorThatMoved)))
         {
-            IsPat(Pices.ShiftColor(colorThatMoved));
+            if (IsPat(Pices.ShiftColor(colorThatMoved)))
+            {
+                gameEnded = true;
+            }
+        }
+        else 
+        {
+            gameEnded = true;
         }
         if (colorThatMoved == Pices.black) 
         {
@@ -581,12 +616,39 @@ public class GameLogic : MonoBehaviour
         gameBoard.GetComponent<GameBoard>().UpdatePices();
         EndPlayerTurn(currentPlayer);
         gameHistory.Add(FENfromBoardState());
+        RepetirionRule();
+
         if (halfMoves > 50) 
         {
             Debug.Log("Remis!");
+            gameEnded = true;
         }
-        Debug.Log("Turn" + turn.ToString());
-        Debug.Log("HalfMoves" + halfMoves.ToString());
+    }
+    private bool RepetirionRule()
+    {
+        string[] states = gameHistory.ToArray().Reverse().ToArray();
+        for(int x = 0; x< states.Count(); x++ ) 
+        {
+            states[x] = states[x].Split(" ")[0];
+        }
+        if (states.Length > 8)
+        {
+            for (int x = 0; x < 4; x++)
+            {
+                if (states[x] != states[4 + x])
+                {
+                    return false;
+
+                }
+            }
+        }
+        else 
+        {
+            return false;
+        }
+        Debug.Log("Draw : Repetition Rule");
+        gameEnded = true;
+        return true;
     }
     private bool IsCheckmate(int color) 
     {
