@@ -17,6 +17,7 @@ using TMPro;
 public class GameLogic : MonoBehaviour
 {
     public int[,] board = new int[8, 8];
+
     public GameObject gameBoard;
     private List<string> gameHistory = new List<string>();
 
@@ -26,12 +27,12 @@ public class GameLogic : MonoBehaviour
     private int halfMoves;
     private int turn;
 
-    public GameObject text;
     public bool autoPlay;
+    private bool gameEnded = false;
 
     public GameObject controller;
-
-    private bool gameEnded = false;
+    public Action<int,string> MoveMade;
+    public Action OnStateJump;
 
     private static Dictionary<int, char> boardToFen = new Dictionary<int, char> 
     { 
@@ -74,20 +75,14 @@ public class GameLogic : MonoBehaviour
     {
         gameHistory.Add("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         boardStateFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-
-        //Matrix4x4 mat = Camera.main.projectionMatrix;
-        //mat *= Matrix4x4.Scale(new Vector3(-1, 1, 1));
-        //Camera.main.projectionMatrix = mat;
         controller.GetComponent<ChessEngineController>().OnNewBestMove += DoMove;
 
-
-
     }
-    private async void DoMove(object sender, EventArgs e)
+    public async void DoMove(string e)
     {
         if (!gameEnded && autoPlay) 
         {
-            string move = controller.GetComponent<ChessEngineController>().bestMove.Last();
+            string move = e;
             Vector2Int from = stringPositionToBoard(move.Substring(0, 2));
             Vector2Int to = stringPositionToBoard(move.Substring(2, 2));
             MovePice(from, to);
@@ -98,14 +93,9 @@ public class GameLogic : MonoBehaviour
     private void EndPlayerTurn( int player ) 
     {
         gameBoard.GetComponent<GameBoard>().activePlayer(currentPlayer);
-        if (player == 1)
-        {
-            currentPlayer = 0;
-        }
-        else 
-        {
-            currentPlayer = 1;
-        }
+        if (player == 1) currentPlayer = 0;
+        else currentPlayer = 1;
+
     }
 
     private string FENfromBoardState() 
@@ -528,12 +518,12 @@ public class GameLogic : MonoBehaviour
         return attackers;
     }
 
-    private string boardPositionToString(Vector2Int position) 
+    public static string boardPositionToString(Vector2Int position) 
     {
         return columnToLetter[position.x] + (8 - position.y).ToString();
     }
 
-    private Vector2Int stringPositionToBoard(string position)
+    public static Vector2Int stringPositionToBoard(string position)
     {
         return new Vector2Int(columnToLetter.FirstOrDefault(z => z.Value == position[0].ToString()).Key , 8 - Int32.Parse( position[1].ToString()));
     }
@@ -590,13 +580,14 @@ public class GameLogic : MonoBehaviour
                 {
                     castleAbility = castleAbility.Replace(castleRook[from], string.Empty);
                 }
+                MoveMade?.Invoke(board[destination.x, destination.y] & Pices.colorMask, boardPositionToString(from) + boardPositionToString(destination) );
                 AfterMove(board[destination.x, destination.y] & Pices.colorMask);
                 return true;
             }
         }
         return false;
     }
-    public async void AfterMove(int colorThatMoved) 
+    public void AfterMove(int colorThatMoved) 
     {
         if (!IsCheckmate(Pices.ShiftColor(colorThatMoved)))
         {
@@ -613,10 +604,11 @@ public class GameLogic : MonoBehaviour
         {
             turn += 1;
         }
-        gameBoard.GetComponent<GameBoard>().UpdatePices();
+        //gameBoard.GetComponent<GameBoard>().UpdatePices();
         EndPlayerTurn(currentPlayer);
         gameHistory.Add(FENfromBoardState());
         RepetirionRule();
+
 
         if (halfMoves > 50) 
         {
@@ -727,7 +719,26 @@ public class GameLogic : MonoBehaviour
         return false;
     }
 
-
+    public void BackInTime(int index) 
+    {
+        if (gameHistory.Count < index) 
+        {
+            return;
+        }
+        List<string> newGameHistory = new List<string>();
+        int x =0;
+        foreach (string fen in gameHistory) 
+        {
+            if (x <= index) 
+            {
+                newGameHistory.Add(fen);
+            }
+            x++;
+        }
+        gameHistory = newGameHistory;
+        boardStateFromFEN(gameHistory.Last());
+        OnStateJump?.Invoke();
+    }
 
 
     IEnumerator Promotion( Vector2Int position) 

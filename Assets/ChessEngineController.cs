@@ -13,28 +13,23 @@ using UnityEditor.PackageManager;
 
 public class ChessEngineController : MonoBehaviour
 {
-    public class StringEventArgs : EventArgs
-    {
-        public string text;
-    }
 
-    public event EventHandler<StringEventArgs> OnNewBestMove;
+    public Action<string> OnNewBestMove ;
     private Process chessEngineProcess;
     private Thread engineThread;
     private bool isEngineRunning;
+    private int len = 0;
     private string path;
-    private int len;
     public List<string> bestMove = new List<string>();
 
     private void Update()
     {
-        if (len < bestMove.Count) 
+        if (len < bestMove.Count)
         {
-            OnNewBestMove?.Invoke(this, new StringEventArgs { text = bestMove.Last() });
+            OnNewBestMove?.Invoke(bestMove.Last() );
             len = bestMove.Count;
         }
     }
-    bool newMove = false;
 
     public GameObject tmp;
     public GameLogic gameLogic;
@@ -42,12 +37,12 @@ public class ChessEngineController : MonoBehaviour
     public async Task NewMove(string notationFEN) 
     {
         SendEngineCommandAsync("position fen " + notationFEN);
-        SendEngineCommandAsync("go depth 20");
+        SendEngineCommandAsync("go depth 22");
     }
     private async void Start()
     {
 
-        path = Application.dataPath; ;
+        path = Application.dataPath;
         // Start the chess engine process in a separate thread
         engineThread = new Thread(RunChessEngine);
         engineThread.Start();
@@ -61,7 +56,7 @@ public class ChessEngineController : MonoBehaviour
         SendEngineCommandAsync("go depth 20");
     }
 
-    private void SendEngineCommandAsync(string command)
+    public void SendEngineCommandAsync(string command)
     {
         if (isEngineRunning)
         {
@@ -119,7 +114,7 @@ public class ChessEngineController : MonoBehaviour
                 bestMove.Add(outputSplit[1]);
             }
         }
-        //UnityEngine.Debug.Log(output);
+        UnityEngine.Debug.Log(output);
     }
 
     private void HandleEngineExit(object sender, System.EventArgs e)

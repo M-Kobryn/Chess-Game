@@ -28,6 +28,13 @@ public class GameBoard : MonoBehaviour
     private Vector2 startPos;
     private float cellSize;
     private int player = 0;
+    //private Color hightlightColor = new Color( 0.827451f, 0.3294118f,0f,1);
+    private Color hightlightColor = new Color(0.2f, 0.59f, 0.85f, 1);
+    //private Color hightlightColor = new Color(0.94f, 0.76f, 0.05f, 1f);
+
+    private Vector2Int from;
+    private Vector2Int to;
+
 
 
 
@@ -49,14 +56,31 @@ public class GameBoard : MonoBehaviour
         BoardObject.transform.parent = gameObject.transform;
         squareGameObjectArray = new GameObject[8, 8];
         CreateBoard();
-
+        gameLogic.GetComponent<GameLogic>().MoveMade += hightlightLastMove;
+        gameLogic.GetComponent<GameLogic>().OnStateJump += SetUp;
     }
+
+    public void hightlightLastMove(int player, string move)
+    {
+        from = GameLogic.stringPositionToBoard(move.Substring(0,2));
+        to = GameLogic.stringPositionToBoard(move.Substring(2,2));
+        UpdateBoard();
+        UpdatePices();
+    }
+    private void SetUp() 
+    {
+        from = Vector2Int.zero;
+        to = Vector2Int.zero;
+        UpdateBoard();
+        UpdatePices();
+    }
+
 
     // Update is called once per frame
     void Update()
     {
-    }
 
+    }
     void DrawSquare(Vector3 position, Sprite sprite, Color color, Vector2Int xy)  
     {
         Vector2 coff = new Vector2( boardLenght *100 / sprite.textureRect.width, boardLenght *100 / sprite.textureRect.height);
@@ -151,6 +175,11 @@ public class GameBoard : MonoBehaviour
             {
                 squareGameObjectArray[x,y].GetComponent<SpriteRenderer>().color = ( (x + y) % 2) == 0 ? blackSquareColor : whiteSquareColor;
             }
+        }
+        if (from != to) 
+        {
+            squareGameObjectArray[from.x, from.y].GetComponent<SpriteRenderer>().color = Color.Lerp(hightlightColor, squareGameObjectArray[from.x, from.y].GetComponent<SpriteRenderer>().color, 0.5f);
+            squareGameObjectArray[to.x, to.y].GetComponent<SpriteRenderer>().color = Color.Lerp(hightlightColor, squareGameObjectArray[from.x, from.y].GetComponent<SpriteRenderer>().color, 0.5f);
         }
     }
 

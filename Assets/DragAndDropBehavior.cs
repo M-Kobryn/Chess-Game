@@ -24,9 +24,8 @@ public class DragAndDropBehavior : MonoBehaviour
 
     }
 
-    public  void Awake()
+    public void Start()
     {
-
     }
 
     private void OnMouseDown()
@@ -45,12 +44,12 @@ public class DragAndDropBehavior : MonoBehaviour
         startPosition = Assets.Utility.FindIndexIn2DArray(gameBoard.GetComponent<GameBoard>().squareGameObjectArray, ray.transform.gameObject);
 
         possibleMoves = gameLogic.PossibleMoves(startPosition);
-        foreach (Vector3Int move in possibleMoves) 
+        foreach (Vector3Int move in possibleMoves)
         {
             Color color = move.z == 0 ? Color.yellow : Color.red;
             color.a = 128;
             Color currentColor = gameBoard.GetComponent<GameBoard>().squareGameObjectArray[move.x, move.y].GetComponent<SpriteRenderer>().color;
-            gameBoard.GetComponent<GameBoard>().squareGameObjectArray[move.x, move.y].GetComponent<SpriteRenderer>().color = Color.Lerp(color,currentColor, 0.5f); 
+            gameBoard.GetComponent<GameBoard>().squareGameObjectArray[move.x, move.y].GetComponent<SpriteRenderer>().color = Color.Lerp(color, currentColor, 0.5f);
         }
     }
 
@@ -59,7 +58,7 @@ public class DragAndDropBehavior : MonoBehaviour
     {
         if (!enabled) return;
         Vector3 tmp = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        transform.position = new Vector3 (tmp.x, tmp.y, -1);
+        transform.position = new Vector3(tmp.x, tmp.y, -1);
     }
 
     private void OnMouseUp()
@@ -81,6 +80,4 @@ public class DragAndDropBehavior : MonoBehaviour
         }
         transform.position = returnMousePostion;
     }
-
-
 }
