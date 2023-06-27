@@ -26,31 +26,31 @@ SpriteAtlas:
       padding: 4
       blockOffset: 1
       allowAlphaSplitting: 0
-      enableRotation: 1
+      enableRotation: 0
       enableTightPacking: 0
       enableAlphaDilation: 0
     secondaryTextureSettings: {}
     variantMultiplier: 1
     packables:
-    - {fileID: 2800000, guid: 997da8a010143cb409355884ba204d7c, type: 3}
+    - {fileID: 2800000, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
-  - {fileID: 1930591639, guid: 997da8a010143cb409355884ba204d7c, type: 3}
-  - {fileID: -1153763819, guid: 997da8a010143cb409355884ba204d7c, type: 3}
-  - {fileID: -84275847, guid: 997da8a010143cb409355884ba204d7c, type: 3}
-  - {fileID: -1259790070, guid: 997da8a010143cb409355884ba204d7c, type: 3}
-  - {fileID: -476039880, guid: 997da8a010143cb409355884ba204d7c, type: 3}
-  - {fileID: -752176357, guid: 997da8a010143cb409355884ba204d7c, type: 3}
+  - {fileID: -1797118581, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
+  - {fileID: -745590631, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
+  - {fileID: -189259104, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
+  - {fileID: -2036842314, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
+  - {fileID: -54267008, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
+  - {fileID: -1881828875, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
   m_PackedSpriteNamesToIndex:
-  - ChessPices_2
-  - ChessPices_3
-  - ChessPices_1
-  - ChessPices_6
-  - ChessPices_4
-  - ChessPices_5
+  - ChessPieces_1
+  - ChessPieces_3
+  - ChessPieces_2
+  - ChessPieces_5
+  - ChessPieces_4
+  - ChessPieces_6
   m_RenderDataMap: {}
   m_Tag: New Sprite Atlas
   m_IsVariant: 0

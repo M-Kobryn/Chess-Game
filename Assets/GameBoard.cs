@@ -130,7 +130,7 @@ public class GameBoard : MonoBehaviour
                     int spriteIndex = board[x,y] &  Pices.piceMask;
                     Color color = (board[x, y] & Pices.colorMask) == Pices.white ? Color.white: Color.black;
                     Sprite[] sprites = new Sprite[6];
-                    DrawPice(new Vector3(boardLenght * x + startPos.x, boardLenght * y + startPos.y, -1), PicesSpriteArray.GetSprite("ChessPices_" + spriteIndex.ToString()), color, new Vector2(x, y));
+                    DrawPice(new Vector3(boardLenght * x + startPos.x, boardLenght * y + startPos.y, -1), PicesSpriteArray.GetSprite("ChessPieces_" + spriteIndex.ToString()), color, new Vector2(x, y));
                 }
             }
         }
@@ -162,7 +162,7 @@ public class GameBoard : MonoBehaviour
                     int spriteIndex = board[x, y] & Pices.piceMask;
                     Color color = (board[x, y] & Pices.colorMask) == Pices.white ? Color.white : Color.black;
                     Sprite[] sprites = new Sprite[6];
-                    DrawPice(new Vector3(boardLenght * x + startPos.x, boardLenght * y + startPos.y, -1), PicesSpriteArray.GetSprite("ChessPices_" + spriteIndex.ToString()), color, new Vector2(x, y));
+                    DrawPice(new Vector3(boardLenght * x + startPos.x, boardLenght * y + startPos.y, -1), PicesSpriteArray.GetSprite("ChessPieces_" + spriteIndex.ToString()), color, new Vector2(x, y));
                 }
             }
         }
