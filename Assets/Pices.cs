@@ -71,16 +71,48 @@ namespace Assets
             }
             return false;
         }
-    }
+        public static string Name(int pice) 
+        {
+            if (pice == 0) 
+            {
+                return "blank";
+            }
+            string output = "";
+            if (Pices.IsWhite(pice))
+            {
+                output += "white";
+            }
+            else 
+            {
+                output += "black";
+            }
+            output += "_";
+            switch (Pices.piceMask & pice)
+            {
+                case 1:
+                    output += "pawn";
+                    break;
+                case 2:
+                    output += "rook";
+                    break;
+                case 3:
+                    output += "knight";
+                    break;
+                case 4:
+                    output += "bishop";
+                    break;
+                case 5:
+                    output += "queen";
+                    break;
+                case 6:
+                    output += "king";
+                    break;
+
+            }
+            return output;
 
 
-    public class Pice 
-    {
-        public int piceType;
-        public int color;
-        public Vector2 dirOfMoves;
-
-        public bool isPinned;
+        }
     }
 
 }

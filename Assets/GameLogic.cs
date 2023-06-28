@@ -21,18 +21,19 @@ public class GameLogic : MonoBehaviour
     public GameObject gameBoard;
     private List<string> gameHistory = new List<string>();
 
-    private int currentPlayer;
+    public int currentPlayer;
     string castleAbility;
     string enpasanePassedSuare;
     private int halfMoves;
     private int turn;
 
-    public bool autoPlay;
+    public bool AutoPlayEnabled;
     private bool gameEnded = false;
 
     public GameObject controller;
     public Action<int,string> MoveMade;
     public Action OnStateJump;
+    bool autoPlayRunning = false;
 
     private static Dictionary<int, char> boardToFen = new Dictionary<int, char> 
     { 
@@ -66,9 +67,17 @@ public class GameLogic : MonoBehaviour
 
 
 
-    private void Update()
+    private async void Update()
     {
-
+        if (AutoPlayEnabled && !autoPlayRunning)
+        {
+            autoPlayRunning = true;
+            await controller.GetComponent<ChessEngineController>().NewMove(gameHistory.Last());
+        }
+        if (!AutoPlayEnabled)
+        {
+            autoPlayRunning = false;
+        }
     }
 
     void Start()
@@ -80,7 +89,7 @@ public class GameLogic : MonoBehaviour
     }
     public async void DoMove(string e)
     {
-        if (!gameEnded && autoPlay) 
+        if (!gameEnded && AutoPlayEnabled) 
         {
             string move = e;
             Vector2Int from = stringPositionToBoard(move.Substring(0, 2));
@@ -92,7 +101,7 @@ public class GameLogic : MonoBehaviour
 
     private void EndPlayerTurn( int player ) 
     {
-        gameBoard.GetComponent<GameBoard>().activePlayer(currentPlayer);
+        //gameBoard.GetComponent<GameBoard>().activePlayer(currentPlayer);
         if (player == 1) currentPlayer = 0;
         else currentPlayer = 1;
 
@@ -343,7 +352,7 @@ public class GameLogic : MonoBehaviour
             {
                 possibleMoves.Add(new Vector3Int(x + 1, y + d, 4));
             }
-            if (x - 1 > 0 && board[x - 1, y + d] == Pices.blank && stringPositionToBoard(enpasanePassedSuare) == new Vector2Int(x - 1, y + d))
+            if (x - 1 >= 0 && board[x - 1, y + d] == Pices.blank && stringPositionToBoard(enpasanePassedSuare) == new Vector2Int(x - 1, y + d))
             {
                 possibleMoves.Add(new Vector3Int(x - 1, y + d, 4));
             }
@@ -549,7 +558,7 @@ public class GameLogic : MonoBehaviour
                     }
                     if (move.z == 4) 
                     {
-                        board[destination.x, destination.y - 1] = 0;
+                        board[destination.x, destination.y + (( Pices.IsWhite(board[destination.x, destination.y]))? 1 : -1 )] = 0;
                     }
                     if (!((destination.y != 0) && destination.y != board.GetLength(0) - 1))
                     {
@@ -580,7 +589,7 @@ public class GameLogic : MonoBehaviour
                 {
                     castleAbility = castleAbility.Replace(castleRook[from], string.Empty);
                 }
-                MoveMade?.Invoke(board[destination.x, destination.y] & Pices.colorMask, boardPositionToString(from) + boardPositionToString(destination) );
+                MoveMade?.Invoke(currentPlayer, boardPositionToString(from) + boardPositionToString(destination) );
                 AfterMove(board[destination.x, destination.y] & Pices.colorMask);
                 return true;
             }

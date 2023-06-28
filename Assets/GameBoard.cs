@@ -28,6 +28,7 @@ public class GameBoard : MonoBehaviour
     private Vector2 startPos;
     private float cellSize;
     private int player = 0;
+    private int currentMove;
     //private Color hightlightColor = new Color( 0.827451f, 0.3294118f,0f,1);
     private Color hightlightColor = new Color(0.2f, 0.59f, 0.85f, 1);
     //private Color hightlightColor = new Color(0.94f, 0.76f, 0.05f, 1f);
@@ -62,6 +63,9 @@ public class GameBoard : MonoBehaviour
 
     public void hightlightLastMove(int player, string move)
     {
+        //currentMove = Pices.ShiftColor(player);
+        currentMove = player;
+
         from = GameLogic.stringPositionToBoard(move.Substring(0,2));
         to = GameLogic.stringPositionToBoard(move.Substring(2,2));
         UpdateBoard();
@@ -69,6 +73,7 @@ public class GameBoard : MonoBehaviour
     }
     private void SetUp() 
     {
+        currentMove =  gameLogic.GetComponent<GameLogic>().currentPlayer == 1 ? 0 : 1; 
         from = Vector2Int.zero;
         to = Vector2Int.zero;
         UpdateBoard();
@@ -103,13 +108,11 @@ public class GameBoard : MonoBehaviour
         Vector2 coff = new Vector2(boardLenght * 100 / sprite.textureRect.width, boardLenght * 100 / sprite.textureRect.height)* 0.8f;
         child.transform.localScale = new Vector3(child.transform.localScale.x * coff.x, child.transform.localScale.y * coff.y, 1);
         child.GetComponent<SpriteRenderer>().sprite = sprite;
-        child.GetComponent<SpriteRenderer>().color = color;
         child.GetComponent<SpriteRenderer>().sortingLayerID = SortingLayer.NameToID("Pieces");
         if (color == Color.white) child.tag = "White";
-        else 
+        else
         {
             child.tag = "Black";
-            child.GetComponent<DragAndDropBehavior>().enabled = false;
         }
         child.GetComponent<DragAndDropBehavior>().gameBoard = gameObject;
         child.GetComponent<DragAndDropBehavior>().gameLogic = gameLogic.GetComponent<GameLogic>();
@@ -127,10 +130,10 @@ public class GameBoard : MonoBehaviour
 
                 if (board[x, y] != 0) 
                 {
-                    int spriteIndex = board[x,y] &  Pices.piceMask;
+                    string spriteIndex = Pices.Name(board[x, y]);
                     Color color = (board[x, y] & Pices.colorMask) == Pices.white ? Color.white: Color.black;
                     Sprite[] sprites = new Sprite[6];
-                    DrawPice(new Vector3(boardLenght * x + startPos.x, boardLenght * y + startPos.y, -1), PicesSpriteArray.GetSprite("ChessPieces_" + spriteIndex.ToString()), color, new Vector2(x, y));
+                    DrawPice(new Vector3(boardLenght * x + startPos.x, boardLenght * y + startPos.y, -1), PicesSpriteArray.GetSprite(spriteIndex), color, new Vector2(x, y));
                 }
             }
         }
@@ -139,15 +142,18 @@ public class GameBoard : MonoBehaviour
         {
             squareGameObjectArray = Utility.FlipHorizontaly2DArray(Utility.FlipVerticaly2DArray(squareGameObjectArray));
         }
+        activePlayer(1);
     }
 
     public void UpdatePices() 
     {
+        int counter = piceList.Count;
         foreach (GameObject obj in piceList) 
         {
             Destroy(obj);
         }
         board = Utility.FlipHorizontaly2DArray(gameLogic.GetComponent<GameLogic>().board);
+
         if (player == 1)
         {
             board = Utility.FlipHorizontaly2DArray(Utility.FlipVerticaly2DArray(board));
@@ -159,13 +165,18 @@ public class GameBoard : MonoBehaviour
             {
                 if (board[x, y] != 0)
                 {
-                    int spriteIndex = board[x, y] & Pices.piceMask;
+                    string spriteIndex = Pices.Name(board[x,y]);
                     Color color = (board[x, y] & Pices.colorMask) == Pices.white ? Color.white : Color.black;
                     Sprite[] sprites = new Sprite[6];
-                    DrawPice(new Vector3(boardLenght * x + startPos.x, boardLenght * y + startPos.y, -1), PicesSpriteArray.GetSprite("ChessPieces_" + spriteIndex.ToString()), color, new Vector2(x, y));
+                    DrawPice(new Vector3(boardLenght * x + startPos.x, boardLenght * y + startPos.y, -1), PicesSpriteArray.GetSprite(spriteIndex), color, new Vector2(x, y));
                 }
             }
         }
+        if (counter > piceList.Count) 
+        {
+            GetComponent<AudioSource>().Play();
+        }
+        activePlayer(currentMove);
     }
     public void UpdateBoard() 
     {

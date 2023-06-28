@@ -130,11 +130,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 250
-        y: 10
+        y: 7
         width: 220
         height: 220
-      alignment: 2
-      pivot: {x: 0.5, y: 1}
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -294,11 +294,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: black_kinght
+      name: black_knight
       rect:
         serializedVersion: 2
-        x: 734
-        y: 244
+        x: 737
+        y: 241
         width: 220
         height: 220
       alignment: 0
@@ -340,7 +340,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 1211
-        y: 241
+        y: 238
         width: 220
         height: 220
       alignment: 0
@@ -369,7 +369,7 @@ TextureImporter:
     nameFileIdTable:
       black_bishop: 824016166
       black_king: -1070082216
-      black_kinght: 83013678
+      black_knight: 83013678
       black_pawn: 4999775
       black_queen: 86309556
       black_rook: 1539150789

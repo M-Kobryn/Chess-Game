@@ -53,7 +53,7 @@ public class ChessEngineController : MonoBehaviour
         // Send a command to the engine asynchronously
         //await SendEngineCommandAsync("uci");
         //await SendEngineCommandAsync("position startpos");
-        SendEngineCommandAsync("go depth 20");
+        //SendEngineCommandAsync("go depth 20");
     }
 
     public void SendEngineCommandAsync(string command)

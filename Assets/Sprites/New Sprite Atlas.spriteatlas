@@ -38,19 +38,31 @@ SpriteAtlas:
     cachedData: {fileID: 0}
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
-  - {fileID: -1797118581, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
+  - {fileID: 1539150789, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
   - {fileID: -745590631, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
+  - {fileID: -1797118581, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
+  - {fileID: -1070082216, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
+  - {fileID: 824016166, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
+  - {fileID: 83013678, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
+  - {fileID: 86309556, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
+  - {fileID: -1881828875, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
+  - {fileID: -54267008, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
+  - {fileID: 4999775, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
   - {fileID: -189259104, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
   - {fileID: -2036842314, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
-  - {fileID: -54267008, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
-  - {fileID: -1881828875, guid: 1849731cb0bee2f48a60509190fc0914, type: 3}
   m_PackedSpriteNamesToIndex:
-  - ChessPieces_1
-  - ChessPieces_3
-  - ChessPieces_2
-  - ChessPieces_5
-  - ChessPieces_4
-  - ChessPieces_6
+  - black_rook
+  - white_knight
+  - white_pawn
+  - black_king
+  - black_bishop
+  - black_knight
+  - black_queen
+  - white_king
+  - white_bishop
+  - black_pawn
+  - white_rook
+  - white_queen
   m_RenderDataMap: {}
   m_Tag: New Sprite Atlas
   m_IsVariant: 0

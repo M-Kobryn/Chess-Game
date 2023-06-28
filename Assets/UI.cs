@@ -43,7 +43,22 @@ public class UI : MonoBehaviour
             }
         }
     }
+    private void RemovesButtons(int index)
+    {
 
+        for (int x = recordsList.Count -1; x > ((int)((index +1) / 2) -1); x--) 
+        {
+            Destroy(recordsList[x]);
+            recordsList.RemoveAt(x);
+        }
+        
+        if (index % 2 != 0) 
+        {
+            recordsList.Last().transform.GetChild(2).gameObject.GetComponentInChildren<TextMeshProUGUI>().text = "";
+        }
+        buttons.RemoveAll(s => s == null);
+
+    }
     private void ChangeBestMove(string e) 
     {
         bestMoveTextField.GetComponent<TextMeshProUGUI>().text = e.Substring(0,2) + " " + e.Substring(2,2);
@@ -54,10 +69,16 @@ public class UI : MonoBehaviour
         int index = 1;
         foreach (GameObject button in buttons) 
         {
+            if (button == null) 
+            {
+                index--;
+                continue;
+            }
             if (button.GetComponentInChildren<TextMeshProUGUI>().text == "") 
             {
                 button.GetComponentInChildren<TextMeshProUGUI>().text = move;
                 button.GetComponent<Button>().onClick.AddListener(delegate { gameLogic.GetComponent<GameLogic>().BackInTime(index); });
+                button.GetComponent<Button>().onClick.AddListener(delegate { RemovesButtons(index); });
                 return;
             }
             index ++;
@@ -65,6 +86,7 @@ public class UI : MonoBehaviour
         createHistoryRecord();
         buttons[buttons.Count - 2].GetComponentInChildren<TextMeshProUGUI>().text = move;
         buttons[buttons.Count - 2].GetComponent<Button>().onClick.AddListener(delegate { gameLogic.GetComponent<GameLogic>().BackInTime(index); });
+        buttons[buttons.Count - 2].GetComponent<Button>().onClick.AddListener(delegate { RemovesButtons(index); });
     }
 
 

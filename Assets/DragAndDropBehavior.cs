@@ -7,7 +7,6 @@ using Assets;
 
 public class DragAndDropBehavior : MonoBehaviour
 {
-    private Vector3 mousePos = Vector3.zero;
     private Vector3 returnMousePostion = Vector3.zero;
 
     [HideInInspector]
@@ -16,7 +15,6 @@ public class DragAndDropBehavior : MonoBehaviour
     public GameObject gameBoard;
     private List<Vector3Int> possibleMoves = new List<Vector3Int>();
 
-    public bool tmpLegalMove = true;
 
     Vector2Int startPosition;
     public void Update()
