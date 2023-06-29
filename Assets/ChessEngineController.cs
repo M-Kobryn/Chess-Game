@@ -20,7 +20,15 @@ public class ChessEngineController : MonoBehaviour
     private bool isEngineRunning;
     private int len = 0;
     private string path;
+
+    private int depth = 20;
+    private int engineElo = 2850;
+
+    public GameLogic gameLogic;
+
     public List<string> bestMove = new List<string>();
+
+
 
     private void Update()
     {
@@ -31,13 +39,28 @@ public class ChessEngineController : MonoBehaviour
         }
     }
 
-    public GameObject tmp;
-    public GameLogic gameLogic;
+
+    public void SetELOCommand(string elo) 
+    {
+        engineElo = Int32.Parse(elo);
+        const int MAX_ELO = 2850;
+        const int MIN_ELO = 1350;
+        float skillFactor =(float) (engineElo - MIN_ELO) / ( MAX_ELO - MIN_ELO);
+        const int MAX_STOCKFISH_SKILL = 20;
+        //SendEngineCommandAsync("setoption name UCI_Elo value " + ((int)(skillFactor * MAX_STOCKFISH_SKILL)).ToString());
+        int skilllevel = Mathf.RoundToInt(MAX_STOCKFISH_SKILL * skillFactor);
+        SendEngineCommandAsync("setoption name skill level value " + skilllevel.ToString());
+    }
+    public void SetDepth(string elo)
+    {
+        depth = Int32.Parse(elo);
+    }
+
 
     public async Task NewMove(string notationFEN) 
     {
         SendEngineCommandAsync("position fen " + notationFEN);
-        SendEngineCommandAsync("go depth 22");
+        SendEngineCommandAsync("go depth " + depth.ToString() );
     }
     private async void Start()
     {
@@ -46,9 +69,10 @@ public class ChessEngineController : MonoBehaviour
         // Start the chess engine process in a separate thread
         engineThread = new Thread(RunChessEngine);
         engineThread.Start();
+        SetELOCommand(engineElo.ToString());
+        SendEngineCommandAsync("setoption name debug value on");
 
         // Wait for the engine to start
-        await Task.Delay(3000);
 
         // Send a command to the engine asynchronously
         //await SendEngineCommandAsync("uci");

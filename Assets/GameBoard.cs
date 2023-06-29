@@ -59,6 +59,7 @@ public class GameBoard : MonoBehaviour
         CreateBoard();
         gameLogic.GetComponent<GameLogic>().MoveMade += hightlightLastMove;
         gameLogic.GetComponent<GameLogic>().OnStateJump += SetUp;
+        FileHandler.OnGameLoad += SimpleUpdate;
     }
 
     public void hightlightLastMove(int player, string move)
@@ -74,6 +75,14 @@ public class GameBoard : MonoBehaviour
     private void SetUp() 
     {
         currentMove =  gameLogic.GetComponent<GameLogic>().currentPlayer == 1 ? 0 : 1; 
+        from = Vector2Int.zero;
+        to = Vector2Int.zero;
+        UpdateBoard();
+        UpdatePices();
+    }
+
+    public void SimpleUpdate() 
+    {
         from = Vector2Int.zero;
         to = Vector2Int.zero;
         UpdateBoard();

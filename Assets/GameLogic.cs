@@ -14,13 +14,15 @@ using UnityEngine.UIElements;
 using System.Threading;
 using TMPro;
 
+[Serializable]
 public class GameLogic : MonoBehaviour
 {
     public int[,] board = new int[8, 8];
 
     public GameObject gameBoard;
-    private List<string> gameHistory = new List<string>();
-
+    public List<string> gameHistory = new List<string>();
+    public List<string> movesHistory = new List<string>();
+    private const string startPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     public int currentPlayer;
     string castleAbility;
     string enpasanePassedSuare;
@@ -34,6 +36,7 @@ public class GameLogic : MonoBehaviour
     public Action<int,string> MoveMade;
     public Action OnStateJump;
     bool autoPlayRunning = false;
+
 
     private static Dictionary<int, char> boardToFen = new Dictionary<int, char> 
     { 
@@ -80,11 +83,19 @@ public class GameLogic : MonoBehaviour
         }
     }
 
+
+    public void toggleAutoPlay()
+    {
+        AutoPlayEnabled = !AutoPlayEnabled;
+    }
+
     void Start()
     {
-        gameHistory.Add("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-        boardStateFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        gameHistory.Add(startPosition);
+        boardStateFromFEN(startPosition);
         controller.GetComponent<ChessEngineController>().OnNewBestMove += DoMove;
+
+        FileHandler.OnGameLoad += SetGameHistory;
 
     }
     public async void DoMove(string e)
@@ -591,6 +602,7 @@ public class GameLogic : MonoBehaviour
                 }
                 MoveMade?.Invoke(currentPlayer, boardPositionToString(from) + boardPositionToString(destination) );
                 AfterMove(board[destination.x, destination.y] & Pices.colorMask);
+                movesHistory.Add(boardPositionToString(from) + boardPositionToString(destination));
                 return true;
             }
         }
@@ -735,6 +747,7 @@ public class GameLogic : MonoBehaviour
             return;
         }
         List<string> newGameHistory = new List<string>();
+        List<string> newMovesHistory = new List<string>();
         int x =0;
         foreach (string fen in gameHistory) 
         {
@@ -744,9 +757,34 @@ public class GameLogic : MonoBehaviour
             }
             x++;
         }
+        x = 0;
+        foreach (string move in movesHistory)
+        {
+            if (x <= index -1)
+            {
+                newMovesHistory.Add(move);
+            }
+            x++;
+        }
         gameHistory = newGameHistory;
+        movesHistory = newMovesHistory;
         boardStateFromFEN(gameHistory.Last());
         OnStateJump?.Invoke();
+    }
+
+    public void SetGameHistory() 
+    {
+        boardStateFromFEN(gameHistory.Last());
+    }
+
+    public void NewGame() 
+    {
+        gameHistory = new List<string>();
+        movesHistory = new List<string>();
+        currentPlayer = 0;
+        AutoPlayEnabled = false;
+        gameEnded = false;
+        boardStateFromFEN(startPosition);
     }
 
 
