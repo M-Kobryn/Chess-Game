@@ -19,6 +19,7 @@ public class GameBoard : MonoBehaviour
     public GameObject gameLogic;
 
     private float offset;
+    public bool gameStarted = false;
 
     [HideInInspector]
     public GameObject[,] squareGameObjectArray;
@@ -27,7 +28,7 @@ public class GameBoard : MonoBehaviour
     private float boardLenght;
     private Vector2 startPos;
     private float cellSize;
-    private int player = 0;
+    private int player = 1;
     private int currentMove;
     //private Color hightlightColor = new Color( 0.827451f, 0.3294118f,0f,1);
     private Color hightlightColor = new Color(0.2f, 0.59f, 0.85f, 1);
@@ -37,7 +38,16 @@ public class GameBoard : MonoBehaviour
     private Vector2Int to;
 
 
-
+    public void ChangePlayerColor() 
+    {
+        if (player == 0) player = 1;
+        else if (player == 1) player = 0;
+        //squareGameObjectArray = Utility.FlipHorizontaly2DArray(squareGameObjectArray);
+        squareGameObjectArray = Utility.FlipHorizontaly2DArray(Utility.FlipVerticaly2DArray(squareGameObjectArray));
+        //board = Utility.FlipHorizontaly2DArray(gameLogic.GetComponent<GameLogic>().board);
+        //board = Utility.FlipHorizontaly2DArray(Utility.FlipVerticaly2DArray(board));
+        SimpleUpdate();
+    }
 
     // Start is called before the first frame update
     void Start()

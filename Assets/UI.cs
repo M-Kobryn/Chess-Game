@@ -13,6 +13,7 @@ public class UI : MonoBehaviour
 {
     public GameObject engine;
     public GameObject gameLogic;
+    public GameObject gameBoard;
     private Color color = new Color(0.2039216f, 0.2862f, 0.3686275f,1);
     public GameObject historyPanel;
     public GameObject historyRecordPrefab;
@@ -86,7 +87,9 @@ public class UI : MonoBehaviour
         buttons.Add(recordsList.Last().transform.GetChild(2).gameObject);
         engine.GetComponent<ChessEngineController>().OnNewBestMove +=  ChangeBestMove;
         gameLogic.GetComponent<GameLogic>().MoveMade += AddToHistory;
-        RequestNewGame += ResetHistoryList;
+       // RequestNewGame += gameLogic.GetComponent<GameLogic>().NewGame;
+      //  RequestNewGame += ResetHistoryList;
+       // RequestNewGame += gameBoard.GetComponent<GameBoard>().SimpleUpdate;
         GetFilesName();
         FileHandler.OnGameLoad += ResetHistoryList;
 
@@ -204,8 +207,9 @@ public class UI : MonoBehaviour
     }
     public void NewGame() 
     {
-        //gameLogic.GetComponent<GameLogic>().NewGame();
-        RequestNewGame?.Invoke();
-        //gameLogic.GetComponent<GameBoard>().SimpleUpdate();
+        gameLogic.GetComponent<GameLogic>().NewGame();
+       // RequestNewGame?.Invoke();
+        gameBoard.GetComponent<GameBoard>().SimpleUpdate();
+        ResetHistoryList();
     }
 }

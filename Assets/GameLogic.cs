@@ -37,6 +37,11 @@ public class GameLogic : MonoBehaviour
     public Action OnStateJump;
     bool autoPlayRunning = false;
 
+    public bool gameStarted = false;
+    public bool OppoenentAI = false;
+
+    public int gameMode;
+
 
     private static Dictionary<int, char> boardToFen = new Dictionary<int, char> 
     { 
@@ -72,6 +77,8 @@ public class GameLogic : MonoBehaviour
 
     private async void Update()
     {
+
+
         if (AutoPlayEnabled && !autoPlayRunning)
         {
             autoPlayRunning = true;
@@ -86,7 +93,25 @@ public class GameLogic : MonoBehaviour
 
     public void toggleAutoPlay()
     {
-        AutoPlayEnabled = !AutoPlayEnabled;
+        if (gameMode == 0) gameMode = 1;
+        else if (gameMode == 1) gameMode = 2;
+        else if (gameMode == 2) gameMode = 0;
+
+        if (gameMode == 0)
+        {
+            AutoPlayEnabled = false;
+            OppoenentAI = false;
+        }
+        else if (gameMode == 1)
+        {
+            AutoPlayEnabled = false;
+            OppoenentAI = true;
+        }
+        else if (gameMode == 2) 
+        {
+            AutoPlayEnabled = true;
+            OppoenentAI = false;
+        }
     }
 
     void Start()
@@ -100,7 +125,7 @@ public class GameLogic : MonoBehaviour
     }
     public async void DoMove(string e)
     {
-        if (!gameEnded && AutoPlayEnabled) 
+        if (!gameEnded && AutoPlayEnabled)
         {
             string move = e;
             Vector2Int from = stringPositionToBoard(move.Substring(0, 2));
